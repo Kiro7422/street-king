@@ -22,33 +22,60 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// MASTER POOL (80 Objekte)
+// --- MASTER POOL (40+ Objekte: Standard & Spezial) ---
 const MASTER_MISSIONS = [
-  { id: 'm1', name: "Eine Person", points: 50, keywords: ["person"] },
-  { id: 'm2', name: "Ein Fahrrad", points: 100, keywords: ["bicycle"] },
-  { id: 'm3', name: "Ein Auto", points: 80, keywords: ["car"] },
-  { id: 'm4', name: "Ein Motorrad", points: 120, keywords: ["motorcycle"] },
-  { id: 'm5', name: "Ein Bus", points: 150, keywords: ["bus"] },
-  { id: 'm6', name: "Ein LKW", points: 150, keywords: ["truck"] },
-  { id: 'm7', name: "Eine Ampel", points: 200, keywords: ["traffic light"] },
-  { id: 'm8', name: "Ein Stoppschild", points: 250, keywords: ["stop sign"] },
-  { id: 'm9', name: "Eine Parkbank", points: 120, keywords: ["bench"] },
-  { id: 'm10', name: "Ein Rucksack", points: 100, keywords: ["backpack"] },
-  { id: 'm11', name: "Ein Regenschirm", points: 150, keywords: ["umbrella"] },
-  { id: 'm12', name: "Eine Handtasche", points: 100, keywords: ["handbag"] },
-  { id: 'm13', name: "Ein Ball", points: 80, keywords: ["sports ball", "soccer ball"] },
-  { id: 'm14', name: "Eine Flasche", points: 60, keywords: ["bottle"] },
-  { id: 'm15', name: "Ein Becher", points: 70, keywords: ["cup"] },
-  { id: 'm16', name: "Ein Stuhl", points: 100, keywords: ["chair"] },
-  { id: 'm17', name: "Eine Pflanze", points: 150, keywords: ["potted plant"] },
-  { id: 'm18', name: "Ein Laptop", points: 200, keywords: ["laptop"] },
-  { id: 'm19', name: "Ein Handy", points: 100, keywords: ["cell phone"] },
-  { id: 'm20', name: "Ein Buch", points: 90, keywords: ["book"] },
-  { id: 'm21', name: "Eine Uhr", points: 150, keywords: ["clock"] },
-  { id: 'm22', name: "Ein Hund", points: 300, keywords: ["dog"] },
-  { id: 'm23', name: "Eine Katze", points: 300, keywords: ["cat"] },
-  { id: 'm24', name: "Ein Vogel", points: 200, keywords: ["bird"] },
-  { id: 'm25', name: "Ein Skateboard", points: 250, keywords: ["skateboard"] }
+  // --- VERKEHR & STADT (Einfach bis Mittel) ---
+  { id: 'm1', name: "Ein Auto", points: 50, keywords: ["car"] },
+  { id: 'm2', name: "Ein Fahrrad", points: 80, keywords: ["bicycle"] },
+  { id: 'm3', name: "Ein Motorrad", points: 100, keywords: ["motorcycle"] },
+  { id: 'm4', name: "Ein Bus", points: 120, keywords: ["bus"] },
+  { id: 'm5', name: "Ein LKW", points: 120, keywords: ["truck"] },
+  { id: 'm6', name: "Eine Ampel", points: 150, keywords: ["traffic light"] },
+  { id: 'm7', name: "Ein Stoppschild", points: 200, keywords: ["stop sign"] },
+  { id: 'm8', name: "Eine Parkbank", points: 100, keywords: ["bench"] },
+
+  // --- SPEZIAL STADT (Schwerer zu finden) ---
+  { id: 'm9', name: "Ein Feuerhydrant", points: 300, keywords: ["fire hydrant"] },
+  { id: 'm10', name: "Eine Parkuhr", points: 350, keywords: ["parking meter"] },
+  { id: 'm11', name: "Eine Topfpflanze", points: 150, keywords: ["potted plant"] },
+
+  // --- MENSCHEN & ACCESSOIRES ---
+  { id: 'm12', name: "Eine Person", points: 40, keywords: ["person"] },
+  { id: 'm13', name: "Ein Rucksack", points: 90, keywords: ["backpack"] },
+  { id: 'm14', name: "Ein Regenschirm", points: 150, keywords: ["umbrella"] },
+  { id: 'm15', name: "Eine Handtasche", points: 100, keywords: ["handbag"] },
+  { id: 'm16', name: "Eine Krawatte", points: 250, keywords: ["tie"] },
+  { id: 'm17', name: "Ein Koffer", points: 200, keywords: ["suitcase"] },
+
+  // --- FREIZEIT & SPORT ---
+  { id: 'm18', name: "Ein Ball", points: 80, keywords: ["sports ball", "soccer ball", "baseball", "tennis ball"] },
+  { id: 'm19', name: "Ein Skateboard", points: 200, keywords: ["skateboard"] },
+  { id: 'm20', name: "Ein Tennisschläger", points: 300, keywords: ["tennis racket"] },
+  { id: 'm21', name: "Ein Frisbee", points: 250, keywords: ["frisbee"] },
+
+  // --- ESSEN & TRINKEN (Lustig & Machbar) ---
+  { id: 'm22', name: "Eine Flasche", points: 60, keywords: ["bottle"] },
+  { id: 'm23', name: "Ein Becher / Tasse", points: 70, keywords: ["cup"] },
+  { id: 'm24', name: "Ein Apfel", points: 150, keywords: ["apple"] },
+  { id: 'm25', name: "Eine Banane", points: 150, keywords: ["banana"] },
+  { id: 'm26', name: "Ein Sandwich", points: 200, keywords: ["sandwich"] },
+  { id: 'm27', name: "Eine Pizza", points: 250, keywords: ["pizza"] },
+  { id: 'm28', name: "Ein Donut", points: 250, keywords: ["donut"] },
+  { id: 'm29', name: "Ein Stück Kuchen", points: 300, keywords: ["cake"] },
+
+  // --- TIERE ---
+  { id: 'm30', name: "Ein Hund", points: 150, keywords: ["dog"] },
+  { id: 'm31', name: "Eine Katze", points: 200, keywords: ["cat"] },
+  { id: 'm32', name: "Ein Vogel", points: 100, keywords: ["bird"] },
+
+  // --- TECHNIK & GEGENSTÄNDE ---
+  { id: 'm33', name: "Ein Handy", points: 100, keywords: ["cell phone", "mobile phone"] },
+  { id: 'm34', name: "Ein Laptop", points: 150, keywords: ["laptop"] },
+  { id: 'm35', name: "Ein Buch", points: 90, keywords: ["book"] },
+  { id: 'm36', name: "Eine Uhr", points: 120, keywords: ["clock", "watch"] },
+  { id: 'm37', name: "Ein Stuhl", points: 80, keywords: ["chair"] },
+  { id: 'm38', name: "Eine Schere", points: 300, keywords: ["scissors"] },
+  { id: 'm39', name: "Ein Teddybär", points: 400, keywords: ["teddy bear"] }
 ];
 
 function MapController({ center }) {
@@ -98,11 +125,11 @@ function App() {
     loadModel();
   }, []);
 
-  // 2. REALTIME SYNC & SICHERHEITS-POLLING (Der Fix für Multiplayer!)
+  // 2. REALTIME SYNC & SICHERHEITS-POLLING
   useEffect(() => {
     if (!room) return;
 
-    // A) LIVE VERBINDUNG (Reagiert sofort auf Datenbank-Events)
+    // A) LIVE VERBINDUNG
     const channel = supabase.channel(`room_channel_${room.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${room.id}` }, (p) => {
         if (p.eventType === 'DELETE') {
@@ -123,33 +150,25 @@ function App() {
       })
       .subscribe();
 
-    // B) SICHERHEITS-CHECK (Alle 2 Sekunden nachfragen - falls Live Verbindung hängt)
+    // B) SICHERHEITS-CHECK
     const interval = setInterval(async () => {
-      // 1. Mitglieder neu laden (damit du deine Freundin siehst)
       fetchMembers();
-
-      // 2. Prüfen ob Spiel gestartet ist (damit es bei ihr startet)
       const { data: currentRoom } = await supabase.from('rooms').select('*').eq('id', room.id).single();
       if (currentRoom) {
         if (currentRoom.is_started && view === 'lobby') {
           setView('game');
         }
       } else {
-        // Falls Raum gelöscht wurde aber Realtime es verpasst hat
         forceMenuReset();
       }
     }, 2000);
 
-    // Initial laden
     fetchMembers();
-
-    // Aufräumen beim Verlassen
     return () => {
       supabase.removeChannel(channel);
       clearInterval(interval);
     };
   }, [room, view]);
-
 
   useEffect(() => {
     if (view === 'game' && members.length > 0) {
@@ -177,10 +196,8 @@ function App() {
     setLoading(true);
     try {
       if (room.host_name === session.username) {
-        // Host archiviert und löscht
         await supabase.rpc('archive_and_close_room', { target_room_id: room.id });
       } else {
-        // Mitglied verlässt
         await supabase.from('room_members').delete().eq('room_id', room.id).eq('username', session.username);
       }
     } catch (e) { console.error(e); }
@@ -191,13 +208,8 @@ function App() {
     if (!window.confirm("Punkte abgeben und beenden?")) return;
     setLoading(true);
     try {
-      // Lokal sofort update
       setMembers(prev => prev.map(m => m.username === session.username ? { ...m, score: currentScore, is_finished: true } : m));
-
-      // DB Update
       await supabase.from('room_members').update({ score: currentScore, is_finished: true }).eq('room_id', room.id).eq('username', session.username);
-
-      // Leaderboard Summierung
       await supabase.rpc('add_score', { target_city: room.city, player_name: session.username, new_points: currentScore });
 
       const others = members.filter(m => m.username !== session.username);
@@ -244,7 +256,6 @@ function App() {
     const finalCity = setupData.city || citySearch; if (!finalCity) return alert("Stadt?"); setLoading(true);
     try {
       const code = Math.random().toString(36).substring(2, 7).toUpperCase();
-      // Zufällige Missionen
       const shuffled = [...MASTER_MISSIONS].sort(() => 0.5 - Math.random());
       const selectedMissions = shuffled.slice(0, 5);
 
