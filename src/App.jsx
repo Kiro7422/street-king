@@ -5,16 +5,16 @@ import { Camera, Users, Map as MapIcon, Loader2, Search, X, LogOut, ArrowLeft, T
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-
+// --- TENSORFLOW KI ---
 import * as tf from '@tensorflow/tfjs';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 
-// --- KEYS EINFÜGEN ---
+// --- DEINE KEYS (Bereits eingefügt) ---
 const SB_URL = "https://pbzwqiheskmmtkpwnqug.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiendxaWhlc2ttbXRrcHducXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY2NzE5ODksImV4cCI6MjA4MjI0Nzk4OX0.fkeP7Vi0qKyfHv4Z2wC0IZd145xc8i1aaFwme2OaESc";
 const supabase = createClient(SB_URL, SB_KEY);
 
-
+// Leaflet Fix
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -22,7 +22,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-
+// MASTER POOL (80 Objekte)
 const MASTER_MISSIONS = [
   { id: 'm1', name: "Eine Person", points: 50, keywords: ["person"] },
   { id: 'm2', name: "Ein Fahrrad", points: 100, keywords: ["bicycle"] },
@@ -98,32 +98,58 @@ function App() {
     loadModel();
   }, []);
 
-  // 2. REALTIME SYNC
+  // 2. REALTIME SYNC & SICHERHEITS-POLLING (Der Fix für Multiplayer!)
   useEffect(() => {
     if (!room) return;
 
-    const roomSub = supabase.channel(`main_${room.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${room.id}` }, (p) => {
-      if (p.eventType === 'DELETE') {
-        alert("Raum wurde aufgelöst.");
-        forceMenuReset();
-      }
-      if (p.eventType === 'UPDATE') {
-        setRoom(prev => ({ ...prev, ...p.new }));
-        if (p.new.is_started) setView('game');
-      }
-    }).subscribe();
+    // A) LIVE VERBINDUNG (Reagiert sofort auf Datenbank-Events)
+    const channel = supabase.channel(`room_channel_${room.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${room.id}` }, (p) => {
+        if (p.eventType === 'DELETE') {
+          alert("Raum wurde aufgelöst.");
+          forceMenuReset();
+        }
+        if (p.eventType === 'UPDATE') {
+          setRoom(prev => ({ ...prev, ...p.new }));
+          if (p.new.is_started) setView('game');
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_members', filter: `room_id=eq.${room.id}` }, (p) => {
+        if (p.eventType === 'DELETE' && p.old && p.old.username === session.username) {
+          alert("Du wurdest entfernt.");
+          forceMenuReset();
+        }
+        fetchMembers();
+      })
+      .subscribe();
 
-    const memSub = supabase.channel(`mem_${room.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'room_members', filter: `room_id=eq.${room.id}` }, (p) => {
-      if (p.eventType === 'DELETE' && p.old.username === session.username) {
-        alert("Du wurdest entfernt.");
-        forceMenuReset();
-      }
+    // B) SICHERHEITS-CHECK (Alle 2 Sekunden nachfragen - falls Live Verbindung hängt)
+    const interval = setInterval(async () => {
+      // 1. Mitglieder neu laden (damit du deine Freundin siehst)
       fetchMembers();
-    }).subscribe();
 
+      // 2. Prüfen ob Spiel gestartet ist (damit es bei ihr startet)
+      const { data: currentRoom } = await supabase.from('rooms').select('*').eq('id', room.id).single();
+      if (currentRoom) {
+        if (currentRoom.is_started && view === 'lobby') {
+          setView('game');
+        }
+      } else {
+        // Falls Raum gelöscht wurde aber Realtime es verpasst hat
+        forceMenuReset();
+      }
+    }, 2000);
+
+    // Initial laden
     fetchMembers();
-    return () => { supabase.removeChannel(roomSub); supabase.removeChannel(memSub); };
-  }, [room]);
+
+    // Aufräumen beim Verlassen
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, [room, view]);
+
 
   useEffect(() => {
     if (view === 'game' && members.length > 0) {
@@ -145,33 +171,33 @@ function App() {
     setRoom(null); setView('menu'); setHasFinishedLocal(false); setCompletedIds([]); setCurrentScore(0); setLoading(false);
   };
 
+  // --- ACTIONS ---
 
   const handleCloseRoomComplete = async () => {
     setLoading(true);
     try {
       if (room.host_name === session.username) {
-
+        // Host archiviert und löscht
         await supabase.rpc('archive_and_close_room', { target_room_id: room.id });
       } else {
-
+        // Mitglied verlässt
         await supabase.from('room_members').delete().eq('room_id', room.id).eq('username', session.username);
       }
     } catch (e) { console.error(e); }
     finally { forceMenuReset(); }
   };
 
-  // SPIELENDE & PUNKTE
   const handleFinishGame = async () => {
     if (!window.confirm("Punkte abgeben und beenden?")) return;
     setLoading(true);
     try {
-      // Lokal sofort
+      // Lokal sofort update
       setMembers(prev => prev.map(m => m.username === session.username ? { ...m, score: currentScore, is_finished: true } : m));
 
       // DB Update
       await supabase.from('room_members').update({ score: currentScore, is_finished: true }).eq('room_id', room.id).eq('username', session.username);
 
-      // Leaderboard Summierung (RPC Funktion)
+      // Leaderboard Summierung
       await supabase.rpc('add_score', { target_city: room.city, player_name: session.username, new_points: currentScore });
 
       const others = members.filter(m => m.username !== session.username);
@@ -214,11 +240,11 @@ function App() {
     }, 500); return () => clearTimeout(t);
   }, [citySearch]);
 
-  // RAUM ERSTELLEN MIT ZUFALLSAUFGABEN
   const createRoom = async () => {
     const finalCity = setupData.city || citySearch; if (!finalCity) return alert("Stadt?"); setLoading(true);
     try {
       const code = Math.random().toString(36).substring(2, 7).toUpperCase();
+      // Zufällige Missionen
       const shuffled = [...MASTER_MISSIONS].sort(() => 0.5 - Math.random());
       const selectedMissions = shuffled.slice(0, 5);
 
